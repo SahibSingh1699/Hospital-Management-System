@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexCare HMS</title>
+  <meta name="description" content="NexCare Hospital Management System — Patients, Doctors, Appointments, EHR, Inventory, Billing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Twinkle+Star&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ── Login Overlay ───────────────────────────────────────── -->
+<div id="authOverlay">
+  <div class="auth-card glass">
+    <div class="auth-logo">NexCare <span class="brand-star">★</span></div>
+    <p class="auth-sub">Hospital Management System</p>
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label">Username <span class="req">*</span></label>
+        <input type="text" id="loginUser" class="form-control" placeholder="e.g. admin" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password <span class="req">*</span></label>
+        <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+    <p id="loginErr"></p>
+  </div>
+</div>
+
+<!-- ── Navbar ──────────────────────────────────────────────── -->
+<nav class="navbar glass">
+  <div class="nav-brand">NexCare <span class="brand-star">★</span></div>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links" id="navLinks">
+    <a href="#dashboard"    class="nav-item active" data-target="dashboard">Dashboard</a>
+    <a href="#departments"  class="nav-item" data-target="departments">Departments</a>
+    <a href="#staff"        class="nav-item" data-target="staff">Staff</a>
+    <a href="#doctors"      class="nav-item" data-target="doctors">Doctors</a>
+    <a href="#patients"     class="nav-item" data-target="patients">Patients</a>
+    <a href="#appointments" class="nav-item" data-target="appointments">Appointments</a>
+    <a href="#records"      class="nav-item" data-target="records">EHR</a>
+    <a href="#inventory"    class="nav-item" data-target="inventory">Inventory</a>
+    <a href="#billing"      class="nav-item" data-target="billing">Billing</a>
+    <button class="btn-logout" id="logoutBtn">⎋ Logout</button>
+  </div>
+</nav>
+
+<!-- ── Main ────────────────────────────────────────────────── -->
+<div class="container">
+
+  <!-- Dashboard -->
+  <section id="dashboard" class="view-section active">
+    <div class="page-header">
+      <div><h2>Hospital Overview</h2><p class="page-subtitle">Live metrics across all modules</p></div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="metric-card glass">
+        <div class="metric-label">Patients</div>
+        <div class="metric-value" id="count-patients">—</div>
+        <div class="metric-icon">🏥</div>
+      </div>
+      <div class="metric-card glass">
+        <div class="metric-label">Doctors</div>
+        <div class="metric-value" id="count-doctors">—</div>
+        <div class="metric-icon">👨‍⚕️</div>
+      </div>
+      <div class="metric-card glass">
+        <div class="metric-label">Departments</div>
+        <div class="metric-value" id="count-departments">—</div>
+        <div class="metric-icon">🏢</div>
+      </div>
+      <div class="metric-card glass">
+        <div class="metric-label">Appointments</div>
+        <div class="metric-value" id="count-appointments">—</div>
+        <div class="metric-icon">📅</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Departments -->
+  <section id="departments" class="view-section">
+    <div class="page-header">
+      <div><h2>Departments</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">🏢</span> Add Department</div>
+        <div id="deptAlert" class="alert alert-warning"></div>
+        <form id="departmentForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Name <span class="req">*</span></label>
+            <input type="text" id="deptName" class="form-control" required placeholder="e.g. Cardiology">
+            <div class="form-error" id="deptNameErr"></div>
+          </div>
+          <button type="submit" class="btn btn-primary">➕ Create Department</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> Department List</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>ID</th><th>Name</th></tr></thead>
+          <tbody id="departmentTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Staff -->
+  <section id="staff" class="view-section">
+    <div class="page-header">
+      <div><h2>Hospital Staff</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">👷</span> Add Employee</div>
+        <div id="staffAlert" class="alert alert-warning"></div>
+        <form id="staffForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="staffName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Position / Role <span class="req">*</span></label>
+            <input type="text" id="staffPosition" class="form-control" required placeholder="e.g. Head Nurse">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Info</label>
+            <input type="text" id="staffContact" class="form-control" placeholder="Phone or Email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department <span class="req">*</span></label>
+            <select id="staffDepartment" class="form-control" required>
+              <option value="">Select Department</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">➕ Hire Staff Member</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> Employee Directory</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Name</th><th>Position</th><th>Department</th></tr></thead>
+          <tbody id="staffTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Doctors -->
+  <section id="doctors" class="view-section">
+    <div class="page-header">
+      <div><h2>Doctors</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">👨‍⚕️</span> Register Doctor</div>
+        <div id="docAlert" class="alert alert-warning"></div>
+        <form id="doctorForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="docName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Specialty</label>
+            <input type="text" id="docSpecialty" class="form-control" placeholder="e.g. Cardiologist">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Info</label>
+            <input type="text" id="docContact" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department <span class="req">*</span></label>
+            <select id="docDepartment" class="form-control" required>
+              <option value="">Select Department</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">➕ Register Doctor</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> Doctors Directory</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Name</th><th>Specialty</th><th>Department</th></tr></thead>
+          <tbody id="doctorTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Patients -->
+  <section id="patients" class="view-section">
+    <div class="page-header">
+      <div><h2>Patient Registry</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">🏥</span> Register Patient</div>
+        <div id="patAlert" class="alert alert-warning"></div>
+        <form id="patientForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="patName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Details</label>
+            <input type="text" id="patContact" class="form-control" placeholder="Phone or Email">
+            <div class="form-hint">Used for duplicate detection</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input type="text" id="patAddress" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary">➕ Register Patient</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> Patients List</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>ID</th><th>Name</th><th>Contact</th></tr></thead>
+          <tbody id="patientTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Appointments -->
+  <section id="appointments" class="view-section">
+    <div class="page-header">
+      <div><h2>Appointments</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📅</span> Schedule Appointment</div>
+        <div id="apptAlert" class="alert alert-warning"></div>
+        <form id="appointmentForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Date &amp; Time <span class="req">*</span></label>
+            <input type="datetime-local" id="appDate" class="form-control" required>
+            <div class="form-hint">Must be a future date/time</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Patient <span class="req">*</span></label>
+            <select id="appPatient" class="form-control" required>
+              <option value="">Select Patient</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Doctor <span class="req">*</span></label>
+            <select id="appDoctor" class="form-control" required>
+              <option value="">Select Doctor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input type="text" id="appNotes" class="form-control" placeholder="Optional notes">
+          </div>
+          <button type="submit" class="btn btn-primary">📅 Schedule Appointment</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> Upcoming Appointments</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Date &amp; Time</th><th>Patient</th><th>Doctor</th></tr></thead>
+          <tbody id="appointmentTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EHR -->
+  <section id="records" class="view-section">
+    <div class="page-header">
+      <div><h2>Electronic Health Records</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📄</span> <span id="ehrFormTitle">Create EHR</span></div>
+        <div id="ehrAlert" class="alert alert-info">ℹ️ Select a patient to check for an existing record.</div>
+        <form id="recordForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Patient <span class="req">*</span></label>
+            <select id="recPatient" class="form-control" required>
+              <option value="">Select Patient</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attending Doctor</label>
+            <select id="recDoctor" class="form-control">
+              <option value="">Select Doctor (optional)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Diagnosis <span class="req">*</span></label>
+            <input type="text" id="recDiagnosis" class="form-control" required placeholder="Primary diagnosis">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Treatment Plan <span class="req">*</span></label>
+            <input type="text" id="recTreatment" class="form-control" required placeholder="Prescribed treatment">
+          </div>
+          <button type="submit" class="btn btn-primary" id="ehrSubmitBtn">💾 Save Health Record</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> All EHR Records</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Patient</th><th>Diagnosis</th><th>Treatment</th><th>Date</th></tr></thead>
+          <tbody id="recordTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inventory -->
+  <section id="inventory" class="view-section">
+    <div class="page-header">
+      <div><h2>Inventory Management</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📦</span> Add / Restock Item</div>
+        <div id="invAlert" class="alert alert-info"></div>
+        <form id="inventoryForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Item Name <span class="req">*</span></label>
+            <input type="text" id="invName" class="form-control" required>
+            <div class="form-hint">If item already exists, quantity will be added to existing stock.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <input type="text" id="invCategory" class="form-control" placeholder="e.g. Medicine, Equipment">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantity <span class="req">*</span></label>
+            <input type="number" id="invQuantity" class="form-control" required min="0" value="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unit Price ($)</label>
+            <input type="number" step="0.01" id="invPrice" class="form-control" min="0" value="0">
+          </div>
+          <button type="submit" class="btn btn-primary">📦 Add to Inventory</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">📋</span> Stock Overview <small id="lowStockBadge"></small></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Item</th><th>Category</th><th>Stock</th><th>Price</th><th>Status</th></tr></thead>
+          <tbody id="inventoryTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Billing -->
+  <section id="billing" class="view-section">
+    <div class="page-header">
+      <div><h2>Billing &amp; Invoices</h2></div>
+    </div>
+    <div class="split-grid">
+      <div class="glass card">
+        <div class="card-title"><span class="icon">💳</span> Generate Invoice</div>
+        <div id="billAlert" class="alert alert-warning"></div>
+        <form id="billingForm" novalidate>
+          <div class="form-group">
+            <label class="form-label">Patient <span class="req">*</span></label>
+            <select id="billPatient" class="form-control" required>
+              <option value="">Select Patient</option>
+            </select>
+          </div>
+          <div id="billExistingAlert" class="alert alert-warning" style="display:none;"></div>
+          <div class="form-group">
+            <label class="form-label">Total Amount ($) <span class="req">*</span></label>
+            <input type="number" step="0.01" id="billAmount" class="form-control" required min="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Status <span class="req">*</span></label>
+            <select id="billStatus" class="form-control">
+              <option value="Unpaid">Unpaid</option>
+              <option value="Partial">Partial</option>
+              <option value="Paid">Paid</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" id="billSubmitBtn">🧾 Generate Invoice</button>
+        </form>
+      </div>
+      <div class="glass card">
+        <div class="card-title"><span class="icon">🧾</span> Invoice Records</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Status</th><th>Update</th></tr></thead>
+          <tbody id="billingTableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.container -->
+<script src="js/app.js"></script>
+</body>
+</html>
