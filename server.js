@@ -12,6 +12,9 @@ require('dotenv').config();
 
 const { PrismaClient } = require('@prisma/client');
 const prisma     = new PrismaClient({});
+async function initDB() {
+  await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = ON;`);
+}
 const app        = express();
 const PORT       = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nexcare-secret-2024';
@@ -274,8 +277,24 @@ async function seedAdmin() {
 }
 
 
-seedAdmin().then(() => {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ NexCare HMS running on port ${PORT}`);
-  });
-});
+async function startServer() {
+  try {
+    await prisma.$connect();
+
+    // 🔥 THIS LINE FIXES YOUR ISSUE
+    await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY AUTOINCREMENT);`);
+
+    console.log("✅ Database connected");
+
+    await seedAdmin();
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✅ NexCare HMS running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error("❌ Server failed:", err);
+  }
+}
+
+startServer();
