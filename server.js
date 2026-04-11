@@ -273,7 +273,6 @@ async function seedAdmin() {
   }
 }
 
-const PORT = process.env.PORT || 3000;
 
 seedAdmin().then(() => {
   app.listen(PORT, '0.0.0.0', () => {
