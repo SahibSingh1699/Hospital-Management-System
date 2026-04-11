@@ -273,4 +273,10 @@ async function seedAdmin() {
   }
 }
 
-seedAdmin().then(() => app.listen(PORT, () => console.log(`✅ NexCare HMS → http://localhost:${PORT}`)));
+const PORT = process.env.PORT || 3000;
+
+seedAdmin().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ NexCare HMS running on port ${PORT}`);
+  });
+});
