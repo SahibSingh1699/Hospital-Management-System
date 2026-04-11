@@ -3,7 +3,7 @@
 // Full data consistency enforced on frontend + backend
 // ============================================================
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 // ── Toast ────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
